@@ -1,8 +1,7 @@
 FROM ollama/ollama
 
-# REMOVE this line (it breaks during build)
-# RUN ollama pull granite-code
+# Code Engine sets $PORT to what it expects your app to use
+ENV OLLAMA_HOST=0.0.0.0:${PORT}
 
-EXPOSE 11434
-ENV OLLAMA_HOST=0.0.0.0:11434
+EXPOSE 8080
 CMD ["serve"]
