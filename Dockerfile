@@ -1,18 +1,19 @@
-FROM ollama/ollama:latest
+FROM ubuntu:20.04
 
-# Install Python and dependencies
 RUN apt-get update && \
-    apt-get install -y python3-pip curl && \
-    pip3 install fastapi uvicorn httpx
+    apt-get install -y curl ca-certificates python3 python3-pip && \
+    curl -fsSL https://ollama.com/install.sh | sh && \
+    pip3 install fastapi uvicorn && \
+    apt-get clean
 
-# Copy your app and entrypoint
-COPY run.py /app/run.py
-COPY entrypoint.sh /app/entrypoint.sh
-WORKDIR /app
-
-RUN chmod +x entrypoint.sh
+ENV PORT=8080
+ENV OLLAMA_MODEL=mistral
+ENV OLLAMA_HOST=0.0.0.0:11434
 
 EXPOSE 8080
+EXPOSE 11434
 
-# 👇 Override the inherited ENTRYPOINT from ollama
-ENTRYPOINT ["/app/entrypoint.sh"]
+COPY app /app
+WORKDIR /app
+
+CMD bash -c "ollama serve & sleep 4 && ollama pull $OLLAMA_MODEL && uvicorn run:app --host 0.0.0.0 --port $PORT"
