@@ -7,13 +7,13 @@ RUN apt-get update && \
     apt-get clean
 
 ENV PORT=8080
-ENV OLLAMA_MODEL=mistral
 ENV OLLAMA_HOST=0.0.0.0:11434
+ENV OLLAMA_MODEL=mistral
 
 EXPOSE 8080
 EXPOSE 11434
 
-COPY app /app
+COPY run.py /app/run.py
 WORKDIR /app
 
 CMD bash -c "ollama serve & sleep 4 && ollama pull $OLLAMA_MODEL && uvicorn run:app --host 0.0.0.0 --port $PORT"
