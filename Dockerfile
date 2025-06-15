@@ -1,12 +1,13 @@
 FROM ollama/ollama:latest
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Pull the model through CLI at build time
+RUN ollama pull mistral-small:latest
 
+# Copy wrapper and entrypoint
 COPY run.py /app/run.py
 WORKDIR /app
 
 EXPOSE 8080
-EXPOSE 11434
 
-CMD ["/entrypoint.sh"]
+# Use uvicorn to serve FastAPI on the correct PORT
+CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8080"]
